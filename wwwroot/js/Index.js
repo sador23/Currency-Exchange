@@ -1,12 +1,17 @@
 ﻿$(document).ready(function () {
 
+    /*
+     * Shall read the inputs, and send it to the server
+     * via ajax call. After the response is available,
+     * it shall display the result on the page.
+     * 
+     * */
     $("#Submit").on("click", function () {
         let From = $('#From option:selected').val();
         let To = $('#To option:selected').val();
         let curr = $('#Change').val();
         let result = $("#result");
         result.html("");
-        //curr.replace(/./g, ",");
 
         $.ajax({
             url: "/Home/CalculateExchange",

@@ -28,20 +28,11 @@ namespace CurrencyExchange.Controllers
 
         public async Task<IActionResult> Index()
         {
-            try
-            {
-                //await _repository.DeleteAll();
-                var response = await _httpHelper.getResponseStreamAsync();
-                var lastDate = _repository.getLastSavedDate();
-                var result = _xmlParser.StreamParser(response, lastDate);
-                ViewData["currencies"] = _repository.GetTodaysRates();
-                await _repository.SeedDatabase(result);
-            }catch(Exception ex)
-            {
-                return Json(ex.StackTrace);
-                _logger.LogWarning(ex.StackTrace);
-            }
-            
+            var response = await _httpHelper.getResponseStreamAsync();
+            var lastDate = _repository.getLastSavedDate();
+            var result = _xmlParser.StreamParser(response, lastDate);
+            ViewData["currencies"] = _repository.GetTodaysRates();
+            await _repository.SeedDatabase(result);
             return View();
         }
 
@@ -52,34 +43,24 @@ namespace CurrencyExchange.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> StatisticData(string id)
+        public IActionResult StatisticData(string id)
         {
-            try
-            {
-                var result = _repository.GetStatisticByCountry(id);
-                return Json(result);
-            }
-            catch(Exception ex)
-            {
-                return Json(ex.StackTrace);
-            }
+            var result = _repository.GetStatisticByCountry(id);
+            return Json(result);
         }
 
 
-        public async Task<IActionResult> List()
+        public IActionResult List()
         {
-            //ExchangeMath math = new ExchangeMath(await _repository.GetTodayRatesDictionary());
             ViewData["currencies"] = _repository.GetTodaysRates();
             return View();
 
         }
         [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> CalculateExchange([FromBody]ExchangeInput exchange)
+        public IActionResult CalculateExchange([FromBody]ExchangeInput exchange)
         {
             if (!ModelState.IsValid)
             {
-                //return View(exchange);
                 return BadRequest(ModelState);
             }
             ExchangeMath math = new ExchangeMath(_repository.GetTodaysRates());
