@@ -1,5 +1,7 @@
 ﻿using CurrencyExchange.Context;
 using CurrencyExchange.DTO;
+using CurrencyExchange.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,13 @@ namespace CurrencyExchange.Services
             return rate;
         }
 
+        public async Task<bool> SaveChangesAsync()
+        {
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
+
+        }
+
         public ICollection<Currency> GetCurrencies()
         {
             return _context.Currency.ToList();
@@ -38,12 +47,149 @@ namespace CurrencyExchange.Services
             return _context.DailyRate.ToList();
         }
 
-        public Dictionary<string,double> GetTodaysRates()
+        public List<DailyCurrency> GetTodaysRates()
         {
-            Dictionary<string, double> rates = new Dictionary<string, double>();
-            var result = _context.DailyRate.Where(x => x.Date.Equals(DateTime.Now.Date));
+            var now = DateTime.Now.Date;
+            var counter = -1;
+            while (!IsDateSaved(now))
+            {
+                now = DateTime.Now.AddDays(counter).Date;
+                counter--;
+            }
+            var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).ToList();
+
+            List<DailyCurrency> rates = new List<DailyCurrency>();
+            foreach (var item in result)
+            {
+                foreach(var curr in item.Currencies.Select(x => new {Rate = x.Rate, Name = x.Currency.Name }))
+                {
+                    DailyCurrency dailyRate = new DailyCurrency()
+                    {
+                        Name = curr.Name,
+                        Rate = curr.Rate
+                    };
+                    rates.Add(dailyRate);
+                }
+            }
             return rates;
         }
 
+        public async Task<Currency> AddCurrencyAsync(string name)
+        {
+            bool isSaved = _context.Currency.Any(x => x.Name.Equals(name));
+            if (!isSaved)
+            {
+                var curr = new Currency()
+                {
+                    Name = name
+                };
+                _context.Currency.Add(curr);
+                await SaveChangesAsync();
+                return curr;
+            }
+            var currency = _context.Currency.FirstOrDefault(x => x.Name.Equals(name));
+            return currency;
+        }
+
+        public async Task<DailyRate> AddDateAsync(DateTime date)
+        {
+            bool isSaved = IsDateSaved(date);
+            if (!isSaved)
+            {
+                var newDate = new DailyRate()
+                {
+                    Date = date.Date
+                };
+                _context.DailyRate.Add(newDate);
+                await SaveChangesAsync();
+                return newDate;
+            }
+            return _context.DailyRate.FirstOrDefault(x => x.Date.Date.Equals(date.Date));// await SaveChangesAsync();
+        }
+
+        public bool IsDateSaved(DateTime date)
+        {
+            bool isSaved = _context.DailyRate.AsNoTracking().Any(x => x.Date.Date.Equals(date.Date));
+            return isSaved;
+        }
+
+        public DateTime getLastSavedDate()
+        {
+            var item = _context.DailyRate.OrderByDescending(x => x.Date).FirstOrDefault();
+            if (item == null) return DateTime.Now.AddDays(-200);
+            return item.Date.Date;
+        }
+
+        public async Task SeedDatabase(Dictionary<DateTime, Dictionary<string,double>> data)
+        {
+            foreach(var item in data)
+            {
+                var readDate = await AddDateAsync(item.Key);
+            }
+            foreach(var item in data)
+            {
+                var readDate = await AddDateAsync(item.Key);
+                await SaveNewDay(item.Value, item.Key, readDate);
+            }
+        }
+
+        public async Task<Dictionary<string,double>> GetTodayRatesDictionary()
+        {
+            Dictionary<string, double> rates = new Dictionary<string, double>();
+            var now = DateTime.Now.Date;
+            if (!IsDateSaved(now))
+            {
+                now = DateTime.Now.AddDays(-1).Date;
+            }
+            var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).FirstOrDefault();
+            foreach(var item in result.Currencies)
+            {
+                rates.Add(item.Currency.Name, item.Rate);
+            }
+            return rates;
+        }
+
+        public async Task<StatisticHelper> GetStatisticByCountry(string name)
+        {
+            StatisticHelper statisticHelper = new StatisticHelper();
+            Dictionary<DateTime, decimal> rates = new Dictionary<DateTime, decimal>();
+            statisticHelper.rates = rates;
+            statisticHelper.Name = name;
+            var result = _context.Currency.Where(x => x.Name.Equals(name)).Include(x => x.DailyRates).ThenInclude(x => x.DailyRate).FirstOrDefault();
+            foreach (var item in result.DailyRates)
+            {
+                rates.Add(item.DailyRate.Date.Date, (decimal)item.Rate);
+            }
+            return statisticHelper;
+
+        }
+
+        public async Task SaveNewDay(Dictionary<string, double> rates, DateTime date, DailyRate dailyRate)
+        {
+            foreach(var item in rates)
+            {
+                var currency = await AddCurrencyAsync(item.Key);
+                Composite composite = new Composite()
+                {
+                    Currency = currency,
+                    DailyRate = dailyRate,
+                    Rate = item.Value
+                };
+                _context.Add(composite);
+            }
+            await SaveChangesAsync();
+        }
+
+
+        /**
+         * 
+         * 
+         */
+        public async Task DeleteAll()
+        {
+            var composites = _context.DailyRate;
+            _context.RemoveRange(composites);
+            await _context.SaveChangesAsync();
+        }
     }
 }

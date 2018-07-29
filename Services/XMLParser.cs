@@ -13,22 +13,29 @@ namespace CurrencyExchange.Services
     public class XMLParser
     {
 
-        public string StreamParser(Stream stream)
+        public Dictionary<DateTime, Dictionary<string, double>> StreamParser(Stream stream, DateTime lastDate)
         {
+            Dictionary<DateTime, Dictionary<string, double>> result = new Dictionary<DateTime, Dictionary<string, double>>();
             XmlReader xmlReader = XmlReader.Create(stream);
-            string output = "";
             while (xmlReader.Read())
             {
                 if (xmlReader.NodeType == XmlNodeType.Element && xmlReader.LocalName.Contains("Cube") )
                 {
-                    output += "This is a node : " + xmlReader.LocalName;
-                    for (int i = 0; i < xmlReader.AttributeCount; i++)
+                    if (xmlReader.AttributeCount == 1)
                     {
-                        output += "Attribute " + i + " is : " + xmlReader.GetAttribute(i);
+                        
+                        Dictionary<string, double> dailyRate = new Dictionary<string, double>();
+                        DateTime date = DateTime.Parse(xmlReader.GetAttribute(0));
+                        if (date.Date.CompareTo(lastDate.Date) <= 0) break;
+                        result.Add(date.Date, dailyRate);
+                        while (xmlReader.Read() && xmlReader.AttributeCount == 2)
+                        {
+                            dailyRate.Add(xmlReader.GetAttribute(0), Double.Parse(xmlReader.GetAttribute(1), System.Globalization.CultureInfo.InvariantCulture));
+                        }
                     }
                 }
             }
-            return output;
+            return result;
         }
     }
 }

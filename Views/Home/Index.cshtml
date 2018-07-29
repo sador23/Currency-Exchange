@@ -1,5 +1,29 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var currencies = ViewData["currencies"] as ICollection<CurrencyExchange.DTO.DailyCurrency>;
+    
 }
+
+<h1 class="text-danger">Welcome</h1>
+<div>
+    <!-- Input and Submit elements -->
+    <label>From:</label>
+    <select id="From">
+        @foreach (var item in currencies)
+        {
+            <option>@item.Name</option>
+        }
+    </select>
+    <select id="To">
+        @foreach (var item in currencies)
+        {
+            <option>@item.Name</option>
+        }
+    </select>
+    <input  type="number" placeholder="Type in the value" step="0.01" id="Change"/>
+    <button  class="btn btn-success" value="Calculate" id="Submit"/>
+</div>
+
+<div id="result"></div>
 
 

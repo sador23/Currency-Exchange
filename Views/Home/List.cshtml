@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "List";
+    var currencies = ViewData["currencies"] as ICollection<CurrencyExchange.DTO.DailyCurrency>;
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Rate</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in currencies)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Rate</td>
+            </tr>
+
+        }
+    </tbody>
+
+</table>

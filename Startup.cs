@@ -39,6 +39,7 @@ namespace CurrencyExchange
 
             services.AddTransient<IHttpHelper, HttpHelper>();
             services.AddTransient<XMLParser>();
+            services.AddScoped<Repository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
