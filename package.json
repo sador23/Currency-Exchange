@@ -8,13 +8,14 @@
     "prod": "webpack --env.NODE_ENV=production --config webpack.config.js --progress"
   },
   "devDependencies": {
+    "bootstrap-select": "^1.13.1",
     "css-loader": "^0.28.11",
     "expose-loader": "^0.7.5",
     "file-loader": "^0.11.2",
+    "rickshaw": "^1.6.6",
     "style-loader": "^0.18.2",
     "url-loader": "^0.5.9",
-    "webpack": "^3.12.0",
-    "rickshaw": "^1.6.6"
+    "webpack": "^3.12.0"
   },
   "dependencies": {
     "bootstrap": "^3.3.7",

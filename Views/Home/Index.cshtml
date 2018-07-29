@@ -4,26 +4,54 @@
     
 }
 
-<h1 class="text-danger">Welcome</h1>
-<div>
-    <!-- Input and Submit elements -->
-    <label>From:</label>
-    <select id="From">
-        @foreach (var item in currencies)
-        {
-            <option>@item.Name</option>
-        }
-    </select>
-    <select id="To">
-        @foreach (var item in currencies)
-        {
-            <option>@item.Name</option>
-        }
-    </select>
-    <input  type="number" placeholder="Type in the value" step="0.01" id="Change"/>
-    <button  class="btn btn-success" value="Calculate" id="Submit"/>
-</div>
 
-<div id="result"></div>
+<div id="exchange-form">
+    <div id="header"><h2>Exchange Currency</h2></div>
+    <div>
+        <!-- Input and Submit elements -->
+        <div class="row">
+            <div class="col-md-6">
+                <label>From:</label>
+            </div>
+            <div class="col-md-6">
+                <select id="From" class="selectpicker form-control">
+                    @foreach (var item in currencies)
+                    {
+                        <option>@item.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label>To:</label>
+            </div>
+            <div class="col-md-6">
+                <select id="To" class="selectpicker form-control">
+                    @foreach (var item in currencies)
+                    {
+                        <option>@item.Name</option>
+                    }
+                </select>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label>Enter the amount</label>
+            </div>
+            <div class="col-md-6">
+                <input type="number" class="form-control" placeholder="Type in the amount" step="0.01" id="Change" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <button class="btn btn-success" value="Calculate" id="Submit">Calculate</button>
+            </div>
+        </div>
+
+          <div id="result"></div>
+        </div>
+    </div>
 
 

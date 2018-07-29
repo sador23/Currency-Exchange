@@ -16,25 +16,13 @@ namespace CurrencyExchange.Services
         public Repository(ExchangerContext context)
         {
             _context = context;
-        }
-
-        public async Task<Currency> GetCurrencyById(int id)
-        {
-            var currency = await _context.Currency.FindAsync(id);
-            return currency;
-        }
-
-        public async Task<DailyRate> GetDailyRateById(int id)
-        {
-            var rate = await _context.DailyRate.FindAsync(id);
-            return rate;
+            _context.Database.EnsureCreated();
         }
 
         public async Task<bool> SaveChangesAsync()
         {
             var result = await _context.SaveChangesAsync();
             return result > 0;
-
         }
 
         public ICollection<Currency> GetCurrencies()
@@ -42,12 +30,7 @@ namespace CurrencyExchange.Services
             return _context.Currency.ToList();
         }
 
-        public ICollection<DailyRate> GetDailyRates()
-        {
-            return _context.DailyRate.ToList();
-        }
-
-        public List<DailyCurrency> GetTodaysRates()
+        private DateTime GetLatestDate()
         {
             var now = DateTime.Now.Date;
             var counter = -1;
@@ -56,6 +39,12 @@ namespace CurrencyExchange.Services
                 now = DateTime.Now.AddDays(counter).Date;
                 counter--;
             }
+            return now;
+        }
+
+        public List<DailyCurrency> GetTodaysRates()
+        {
+            var now = GetLatestDate();
             var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).ToList();
 
             List<DailyCurrency> rates = new List<DailyCurrency>();
@@ -104,7 +93,7 @@ namespace CurrencyExchange.Services
                 await SaveChangesAsync();
                 return newDate;
             }
-            return _context.DailyRate.FirstOrDefault(x => x.Date.Date.Equals(date.Date));// await SaveChangesAsync();
+            return _context.DailyRate.FirstOrDefault(x => x.Date.Date.Equals(date.Date));
         }
 
         public bool IsDateSaved(DateTime date)
@@ -133,23 +122,19 @@ namespace CurrencyExchange.Services
             }
         }
 
-        public async Task<Dictionary<string,double>> GetTodayRatesDictionary()
-        {
-            Dictionary<string, double> rates = new Dictionary<string, double>();
-            var now = DateTime.Now.Date;
-            if (!IsDateSaved(now))
-            {
-                now = DateTime.Now.AddDays(-1).Date;
-            }
-            var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).FirstOrDefault();
-            foreach(var item in result.Currencies)
-            {
-                rates.Add(item.Currency.Name, item.Rate);
-            }
-            return rates;
-        }
+        //public Dictionary<string,double> GetTodayRatesDictionary()
+        //{
+        //    Dictionary<string, double> rates = new Dictionary<string, double>();
+        //    var now = GetLatestDate();
+        //    var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).FirstOrDefault();
+        //    foreach(var item in result.Currencies)
+        //    {
+        //        rates.Add(item.Currency.Name, item.Rate);
+        //    }
+        //    return rates;
+        //}
 
-        public async Task<StatisticHelper> GetStatisticByCountry(string name)
+        public StatisticHelper GetStatisticByCountry(string name)
         {
             StatisticHelper statisticHelper = new StatisticHelper();
             Dictionary<DateTime, decimal> rates = new Dictionary<DateTime, decimal>();

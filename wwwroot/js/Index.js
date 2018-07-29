@@ -17,7 +17,7 @@
                 "From": From, "To": To, "Value": curr
             }),
             success: function (data) {
-                result.append(`${curr} ${From} is ${data} ${To}`);
+                result.append(`<h2 class="result">${curr} ${From} is ${data} ${To}<h2>`);
             },
             error: function (ex) {
                 console.log(ex);

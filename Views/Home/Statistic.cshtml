@@ -4,20 +4,24 @@
     var currencies = ViewData["currencies"] as ICollection<CurrencyExchange.DTO.DailyCurrency>;
 }
 
-<h2>Statistic</h2>
 
-<label>Select Country</label>
-<select id="Filter">
-    @foreach (var item in currencies)
-    {
-        <option>@item.Name</option>
-    }
-</select>
-<label>Select graph type</label>
-<select id="GraphType">
-    <option>Line</option>
-    <option>Bar</option>
-</select>
+<div id="exchange-form-statistic">
+    <h2>Statistic</h2>
 
-<canvas id="myChart" width="400" height="400"></canvas>
+    <label>Select Country</label>
+    <select id="Filter">
+        @foreach (var item in currencies)
+        {
+            <option>@item.Name</option>
+        }
+    </select>
+    <label>Select graph type</label>
+    <select id="GraphType">
+        <option>Line</option>
+        <option>Bar</option>
+    </select>
 
+    <div id="graph">
+        <canvas id="myChart" width="600" height="600"></canvas>
+    </div>
+    </div>

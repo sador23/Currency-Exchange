@@ -4,22 +4,24 @@
     var currencies = ViewData["currencies"] as ICollection<CurrencyExchange.DTO.DailyCurrency>;
 }
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <td>Name</td>
-            <td>Rate</td>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach(var item in currencies)
-        {
+<div id="exchange-form-list">
+    <table class="table table-borderd table-hover">
+        <thead>
             <tr>
-                <td>@item.Name</td>
-                <td>@item.Rate</td>
+                <td>Name</td>
+                <td>Rate</td>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in currencies)
+            {
+                <tr>
+                    <td id="name">@item.Name</td>
+                    <td>@item.Rate</td>
+                </tr>
 
-        }
-    </tbody>
+            }
+        </tbody>
 
-</table>
+    </table>
+</div>

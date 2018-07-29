@@ -28,12 +28,20 @@ namespace CurrencyExchange.Controllers
 
         public async Task<IActionResult> Index()
         {
-            //await _repository.DeleteAll();
-            var response = await _httpHelper.getResponseStreamAsync();
-            var lastDate = _repository.getLastSavedDate();
-            var result = _xmlParser.StreamParser(response,lastDate);
-            ViewData["currencies"] = _repository.GetTodaysRates();
-            await _repository.SeedDatabase(result);
+            try
+            {
+                //await _repository.DeleteAll();
+                var response = await _httpHelper.getResponseStreamAsync();
+                var lastDate = _repository.getLastSavedDate();
+                var result = _xmlParser.StreamParser(response, lastDate);
+                ViewData["currencies"] = _repository.GetTodaysRates();
+                await _repository.SeedDatabase(result);
+            }catch(Exception ex)
+            {
+                return Json(ex.StackTrace);
+                _logger.LogWarning(ex.StackTrace);
+            }
+            
             return View();
         }
 
@@ -74,8 +82,9 @@ namespace CurrencyExchange.Controllers
                 //return View(exchange);
                 return BadRequest(ModelState);
             }
-            ExchangeMath math = new ExchangeMath(await _repository.GetTodayRatesDictionary());
-            return Json(math.CalculateExchange(exchange));
+            ExchangeMath math = new ExchangeMath(_repository.GetTodaysRates());
+            var result = math.CalculateExchange(exchange);
+            return Json(math.GetDecimalFormattedString(result,2));
         }
     }
 }
