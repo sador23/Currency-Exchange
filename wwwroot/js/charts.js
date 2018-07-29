@@ -1,7 +1,6 @@
 ﻿$(document).ready(function () {
 
     var myChart = null;
-    //var changed = false;
 
     $("#Filter,#GraphType").on("change", function () {
         let name = $('#Filter option:selected').val();

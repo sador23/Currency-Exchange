@@ -1,13 +1,7 @@
 ﻿body {
     background: url(../../../images/bg1.jpg) no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
     background-size: cover;
 }
-
-
-/*background image positioning end - by nectarine*/
 
 .result {
     text-align: center;
@@ -21,29 +15,26 @@
 #exchange-form {
     width: 500px;
     height: 340px;
-    box-shadow: 5px 4px 43px #222222;
-    background-color: rgba(128,128,128, 0.8);
-    padding: 30px;
-    border: 2px solid dimgrey;
-    border-radius: 4px;
-    left: 50%;
     top: 50%;
-    margin-left: -250px; /*half width*/
-    margin-top: -150px; /*half height*/
+    margin-left: -250px;
+    margin-top: -150px;
     position:fixed;
-    color:orange;
 }
 
-#exchange-form-list {
-    width:500px;
+.exchange {
     box-shadow: 5px 4px 43px #222222;
     background-color: rgba(128,128,128, 0.9);
     padding: 30px;
     border: 2px solid dimgrey;
     border-radius: 4px;
-    margin-left:-250px;
-    position:absolute;
+    position: absolute;
     left: 50%;
+    color:orange;
+}
+
+#exchange-form-list {
+    width: 500px;
+    margin-left: -250px;
 }
 
 canvas {
@@ -52,15 +43,7 @@ canvas {
 
 #exchange-form-statistic {
     width: 900px;
-    box-shadow: 5px 4px 43px #222222;
-    background-color: rgba(128,128,128, 1);
-    padding: 30px;
-    border: 2px solid dimgrey;
-    border-radius: 4px;
     margin-left: -450px;
-    position: absolute;
-    left: 50%;
-    color:orange;
 }
 
 table{
