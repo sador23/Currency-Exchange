@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CurrencyExchange.DTO;
 using CurrencyExchange.Services;
 using Microsoft.AspNetCore.Mvc;
