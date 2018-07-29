@@ -1,9 +1,6 @@
 ﻿using CurrencyExchange.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CurrencyExchange.DTO
 {
@@ -13,7 +10,6 @@ namespace CurrencyExchange.DTO
 
         [Required]
         public string Name { get; set; }
-
         public ICollection<Composite> DailyRates { get; set; }
     }
 }

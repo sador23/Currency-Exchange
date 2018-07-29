@@ -25,7 +25,7 @@ namespace CurrencyExchange.Controllers
         public async Task<IActionResult> Index()
         {
             var response = await _httpHelper.getResponseStreamAsync();
-            var lastDate = _repository.getLastSavedDate();
+            var lastDate = _repository.GetLastSavedDate();
             var result = _xmlParser.StreamParser(response, lastDate);
             ViewData["currencies"] = _repository.GetTodaysRates();
             await _repository.SeedDatabase(result);

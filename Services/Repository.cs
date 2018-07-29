@@ -63,6 +63,13 @@ namespace CurrencyExchange.Services
             return rates;
         }
 
+        /**
+        * AddCurrencyAsync
+        * If the Country is not saved to the database,
+        * it shall save it. 
+        * Shall return the object from the table with the given name
+        * <param name="name">The name of the country</param>
+        **/
         public async Task<Currency> AddCurrencyAsync(string name)
         {
             bool isSaved = _context.Currency.Any(x => x.Name.Equals(name));
@@ -80,6 +87,13 @@ namespace CurrencyExchange.Services
             return currency;
         }
 
+        /**
+        * AddDateAsync
+        * If the Date is not saved to the database,
+        * it shall save it. 
+        * Shall return the object from the table with the given date
+        * <param name="date">The date to be saved</param>
+        **/
         public async Task<DailyRate> AddDateAsync(DateTime date)
         {
             bool isSaved = IsDateSaved(date);
@@ -102,7 +116,12 @@ namespace CurrencyExchange.Services
             return isSaved;
         }
 
-        public DateTime getLastSavedDate()
+        /**
+        * GetLastSavedDate
+        * Returns the latest saved date, and provides a fallback value
+        * if none is saved
+        **/
+        public DateTime GetLastSavedDate()
         {
             var item = _context.DailyRate.OrderByDescending(x => x.Date).FirstOrDefault();
             if (item == null) return DateTime.Now.AddDays(-200);
@@ -121,18 +140,6 @@ namespace CurrencyExchange.Services
                 await SaveNewDay(item.Value, item.Key, readDate);
             }
         }
-
-        //public Dictionary<string,double> GetTodayRatesDictionary()
-        //{
-        //    Dictionary<string, double> rates = new Dictionary<string, double>();
-        //    var now = GetLatestDate();
-        //    var result = _context.DailyRate.Where(x => x.Date.Equals(now)).Include(x => x.Currencies).ThenInclude(x => x.Currency).FirstOrDefault();
-        //    foreach(var item in result.Currencies)
-        //    {
-        //        rates.Add(item.Currency.Name, item.Rate);
-        //    }
-        //    return rates;
-        //}
 
         public StatisticHelper GetStatisticByCountry(string name)
         {
@@ -165,11 +172,6 @@ namespace CurrencyExchange.Services
             await SaveChangesAsync();
         }
 
-
-        /**
-         * 
-         * 
-         */
         public async Task DeleteAll()
         {
             var composites = _context.DailyRate;
