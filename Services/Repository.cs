@@ -16,7 +16,6 @@ namespace CurrencyExchange.Services
         public Repository(ExchangerContext context)
         {
             _context = context;
-            _context.Database.EnsureCreated();
         }
 
         public async Task<bool> SaveChangesAsync()
@@ -38,6 +37,7 @@ namespace CurrencyExchange.Services
             {
                 now = DateTime.Now.AddDays(counter).Date;
                 counter--;
+                if (counter < -110) throw new Exception("Something went wrong");
             }
             return now;
         }
@@ -72,7 +72,7 @@ namespace CurrencyExchange.Services
         **/
         public async Task<Currency> AddCurrencyAsync(string name)
         {
-            bool isSaved = _context.Currency.Any(x => x.Name.Equals(name));
+            bool isSaved = _context.Currency.AsNoTracking().Any(x => x.Name.Equals(name));
             if (!isSaved)
             {
                 var curr = new Currency()
@@ -83,7 +83,7 @@ namespace CurrencyExchange.Services
                 await SaveChangesAsync();
                 return curr;
             }
-            var currency = _context.Currency.FirstOrDefault(x => x.Name.Equals(name));
+            var currency = await _context.Currency.FirstOrDefaultAsync(x => x.Name.Equals(name));
             return currency;
         }
 
@@ -107,7 +107,7 @@ namespace CurrencyExchange.Services
                 await SaveChangesAsync();
                 return newDate;
             }
-            return _context.DailyRate.FirstOrDefault(x => x.Date.Date.Equals(date.Date));
+            return await _context.DailyRate.FirstOrDefaultAsync(x => x.Date.Date.Equals(date.Date));
         }
 
         public bool IsDateSaved(DateTime date)
@@ -121,8 +121,9 @@ namespace CurrencyExchange.Services
         * Returns the latest saved date, and provides a fallback value
         * if none is saved
         **/
-        public DateTime GetLastSavedDate()
+        public async Task<DateTime> GetLastSavedDate()
         {
+            await _context.Database.EnsureCreatedAsync();
             var item = _context.DailyRate.OrderByDescending(x => x.Date).FirstOrDefault();
             if (item == null) return DateTime.Now.AddDays(-200);
             return item.Date.Date;
@@ -130,7 +131,7 @@ namespace CurrencyExchange.Services
 
         public async Task SeedDatabase(Dictionary<DateTime, Dictionary<string,double>> data)
         {
-            foreach(var item in data)
+            foreach (var item in data)
             {
                 var readDate = await AddDateAsync(item.Key);
             }

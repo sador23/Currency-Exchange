@@ -25,10 +25,10 @@ namespace CurrencyExchange.Controllers
         public async Task<IActionResult> Index()
         {
             var response = await _httpHelper.getResponseStreamAsync();
-            var lastDate = _repository.GetLastSavedDate();
-            var result = _xmlParser.StreamParser(response, lastDate);
-            ViewData["currencies"] = _repository.GetTodaysRates();
+            var lastDate = await _repository.GetLastSavedDate();
+            var result =  _xmlParser.StreamParser(response, lastDate);
             await _repository.SeedDatabase(result);
+            ViewData["currencies"] = _repository.GetTodaysRates();
             return View();
         }
 
